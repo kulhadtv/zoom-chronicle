@@ -1,4 +1,4 @@
-import "../styles/pages/PostDetails.css";
+import "../styles/pages/postDetails.css";
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
