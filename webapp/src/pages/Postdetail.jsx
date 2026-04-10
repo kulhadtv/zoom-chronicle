@@ -1,3 +1,4 @@
+import "../styles/pages/postDetails.css";
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
@@ -8,8 +9,6 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { NewsCard } from '../components/common/NewsCard';
 import CalendarWidget from '../components/common/CalendarWidget';
-import { NewsCardH } from '../components/common/NewsCard';
-import "../styles/pages/postdetails.css"
 import { postsAPI } from '../api/axios';
 
 const timeAgo = (date) => {
