@@ -43,30 +43,30 @@ export const authAPI = {
    POSTS
 ════════════════════════════════════════ */
 export const postsAPI = {
-  getAll: (params) => api.get('/posts', { params }),
-  getTrending: () => api.get('/posts/trending'),
-  getMoreViewsPosts: () => api.get('/posts/more-views'),
-  getPostForAdmin: (params) => api.get('/posts/all-post-admin', { params }),
-  getSlugs: () => api.get('/posts/slugs'),
-  getByCategory: (cat, params) => api.get(`/posts/category/${cat}`, { params }),
-  getByTags: (params) => api.get('/posts/tags', { params }),
-  getByDate: (params) => api.get('/posts/date', { params }),
-  getById: (id) => api.get(`/posts/${id}`),
-  getBySlug: (slug) => api.get(`/posts/slug/${slug}`),
-  create: (data) => api.post('/posts', data, { headers: { 'Content-Type': 'multipart/form-data' } }),
-  update: (id, data) => api.put(`/posts/${id}`, data, { headers: { 'Content-Type': 'multipart/form-data' } }),
-  delete: (id) => api.delete(`/posts/${id}`),
-  toggleLike: (id) => api.post(`/posts/${id}/like`),
+  getAll: (params) => api.get('/api/posts', { params }),
+  getTrending: () => api.get('/api/posts/trending'),
+  getMoreViewsPosts: () => api.get('/api/posts/more-views'),
+  getPostForAdmin: (params) => api.get('/api/posts/all-post-admin', { params }),
+  getSlugs: () => api.get('/api/posts/slugs'),
+  getByCategory: (cat, params) => api.get(`/api/posts/category/${cat}`, { params }),
+  getByTags: (params) => api.get('/api/posts/tags', { params }),
+  getByDate: (params) => api.get('/api/posts/date', { params }),
+  getById: (id) => api.get(`/api/posts/${id}`),
+  getBySlug: (slug) => api.get(`/api/posts/slug/${slug}`),
+  create: (data) => api.post('/api/posts', data, { headers: { 'Content-Type': 'multipart/form-data' } }),
+  update: (id, data) => api.put(`/api/posts/${id}`, data, { headers: { 'Content-Type': 'multipart/form-data' } }),
+  delete: (id) => api.delete(`/api/posts/${id}`),
+  toggleLike: (id) => api.post(`/api/posts/${id}/like`),
 };
 
 /* ════════════════════════════════════════
    ADMIN – USERS
 ════════════════════════════════════════ */
 export const adminAPI = {
-  getAllUsers: () => api.get('/auth/users'),
-  updateRole: (id, role) => api.put(`/auth/users/${id}/role`, { role }),
-  deactivate: (id) => api.put(`/auth/users/${id}/deactivate`),
-  activate: (id) => api.put(`/auth/users/${id}/activate`),
+  getAllUsers: () => api.get('/api/auth/users'),
+  updateRole: (id, role) => api.put(`/api/auth/users/${id}/role`, { role }),
+  deactivate: (id) => api.put(`/api/auth/users/${id}/deactivate`),
+  activate: (id) => api.put(`/api/auth/users/${id}/activate`),
 };
 
 export default api;
