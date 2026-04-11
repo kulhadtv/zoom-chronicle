@@ -335,6 +335,11 @@
 }
 
 @media (max-width: 640px) {
+
+    .search-box {
+    display: none;
+}
+
     .search-input-wrap {
         display: none;
     }
