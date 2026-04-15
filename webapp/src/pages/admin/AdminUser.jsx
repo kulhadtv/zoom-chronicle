@@ -98,10 +98,10 @@ export default function AdminUsers() {
                                                 fontFamily: 'var(--font-heading)', fontWeight: 700,
                                                 color: 'var(--color-primary)', flexShrink: 0, fontSize: 'var(--text-sm)'
                                             }}>
-                                                {(u.name || u.email || 'U')[0].toUpperCase()}
+                                                {(u.username || u.email || 'U')[0].toUpperCase()}
                                             </div>
                                             <div style={{ fontFamily: 'var(--font-heading)', fontWeight: 600, color: 'var(--color-text)' }}>
-                                                {u.name || 'Unnamed User'}
+                                                {u.username || 'Unnamed User'}
                                             </div>
                                         </div>
                                     </td>

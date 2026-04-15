@@ -28,11 +28,11 @@ export const AuthProvider = ({ children }) => {
   };
 
   const isAdmin   = user?.role === 'admin';
-  const isAuthor  = user?.role === 'author' || isAdmin;
+  // const isAuthor  = user?.role === 'author' || isAdmin;
   const isLoggedIn = !!user;
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, isAdmin, isAuthor, isLoggedIn }}>
+    <AuthContext.Provider value={{ user, loading, login, logout, isAdmin, isLoggedIn }}>
       {children}
     </AuthContext.Provider>
   );
