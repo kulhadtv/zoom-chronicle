@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   RiAddLine, RiEditLine, RiDeleteBinLine, RiSearchLine,
+  RiCheckLine, RiAlertLine, RiCloseLine
 } from 'react-icons/ri';
 import Pagination from '../../components/common/Pagination';
 import { postsAPI } from '../../api/axios';
@@ -13,6 +14,8 @@ export function AdminPost() {
   const [search, setSearch] = useState('');
   const [pagination, setPagi] = useState({ page: 1, pages: 1, total: 0 });
   const [deleting, setDeleting] = useState(null);
+  const [toast, setToast] = useState(null); // { type, msg }
+  const [deleteModal, setDeleteModal] = useState({ show: false, postId: null, postTitle: '' });
 
   const fetchPosts = async (page = 1) => {
     setLoading(true);
@@ -30,15 +33,31 @@ export function AdminPost() {
 
   useEffect(() => { fetchPosts(1); }, [search]);
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Delete this post permanently?')) return;
-    setDeleting(id);
+  const showToast = (type, msg) => {
+    setToast({ type, msg });
+    setTimeout(() => setToast(null), 3500);
+  };
+
+  const openDeleteModal = (postId, postTitle) => {
+    setDeleteModal({ show: true, postId, postTitle });
+  };
+
+  const closeDeleteModal = () => {
+    setDeleteModal({ show: false, postId: null, postTitle: '' });
+  };
+
+  const confirmDelete = async () => {
+    const { postId } = deleteModal;
+    setDeleting(postId);
+    closeDeleteModal();
     try {
-      await postsAPI.delete(id);
-      setPosts(p => p.filter(x => x._id !== id));
+      await postsAPI.delete(postId);
+      setPosts(p => p.filter(x => x._id !== postId));
       setPagi(prev => ({ ...prev, total: Math.max(0, prev.total - 1) }));
-    } catch {
-      alert('Delete failed. Try again.');
+      showToast('success', 'Post deleted successfully!');
+    } catch (err) {
+      console.error('Delete error:', err);
+      showToast('error', 'Delete failed. Please try again.');
     } finally {
       setDeleting(null);
     }
@@ -51,6 +70,58 @@ export function AdminPost() {
 
   return (
     <div>
+      {/* Toast Notification */}
+      {toast && (
+        <div className={`form-toast ${toast.type}`}>
+          {toast.type === 'success' ? <RiCheckLine size={16} /> : <RiAlertLine size={16} />}
+          {toast.msg}
+        </div>
+      )}
+
+      {deleteModal.show && (
+        <div className="modal-overlay" onClick={closeDeleteModal}>
+          <div
+            className="modal max-w-sm rounded-2xl"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="modal-header px-5 py-4">
+              <div className="flex items-center gap-2">
+                <span className="text-lg">🗑️</span>
+                <div className="modal-title text-base">Delete Post</div>
+              </div>
+              <button className="btn btn-ghost btn-sm" onClick={closeDeleteModal}>
+                <RiCloseLine size={15} />
+              </button>
+            </div>
+
+            <div className="modal-body px-5 py-4 gap-2">
+              <p className="text-sm text-muted">
+                Are you sure you want to permanently delete:
+              </p>
+              <p className="delete-post-title-preview">
+                "{deleteModal.postTitle}"
+              </p>
+              <p className="text-xs text-muted mt-1">
+                This action cannot be undone.
+              </p>
+            </div>
+
+            <div className="modal-footer px-5 py-3">
+              <button className="btn btn-outline btn-sm" onClick={closeDeleteModal}>
+                Cancel
+              </button>
+              <button
+                className="btn btn-danger btn-sm"
+                onClick={confirmDelete}
+                disabled={deleting === deleteModal.postId}
+              >
+                {deleting === deleteModal.postId ? 'Deleting…' : 'Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="admin-table-wrap">
         <div className="admin-table-header">
           <div className="admin-table-title">
@@ -145,7 +216,7 @@ export function AdminPost() {
                           </button>
                           <button
                             className="tbl-btn tbl-btn-delete"
-                            onClick={() => handleDelete(p._id)}
+                            onClick={() => openDeleteModal(p._id, p.title)}
                             disabled={deleting === p._id}
                           >
                             <RiDeleteBinLine size={11} />

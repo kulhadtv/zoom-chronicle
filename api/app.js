@@ -14,7 +14,6 @@ app.use(cors( process.env.NODE_ENV === 'production' ? { origin: process.env.FRON
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(errorHandler)
 
 // Routes
 app.use('/api/posts', postsRoute);
@@ -24,10 +23,7 @@ app.get('/health', (req, res) => {
   res.json({ message: 'API is running' });
 });
 
-
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ message: 'Something went wrong!' });
-});
+// Error handling middleware (must be last)
+app.use(errorHandler);
 
 export default app;

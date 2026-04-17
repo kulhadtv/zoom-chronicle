@@ -7,11 +7,6 @@ import SectionBlock from '../sections/SectionBlock';
 
 const FEATURED_CATEGORIES = ['Sports', 'Business', 'Entertainment', 'Technology'];
 
-/**
- * HomePage
- * Thin orchestrator — all data lives in useHomePosts,
- * all UI lives in the section components.
- */
 export default function HomePage() {
     const {
         posts,

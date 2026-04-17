@@ -4,7 +4,6 @@
     background: var(--color-bg-soft);
 }
 
-/* ─── SIDEBAR ─────────────────────────────────────────────────────── */
 .admin-sidebar {
     width: 240px;
     flex-shrink: 0;
@@ -137,7 +136,6 @@
     text-transform: uppercase;
 }
 
-/* ─── MAIN AREA ──────────────────────────────────────────────────── */
 .admin-main {
     flex: 1;
     /* margin-left: 240px; */
@@ -172,7 +170,6 @@
     flex: 1;
 }
 
-/* ─── STAT CARDS ─────────────────────────────────────────────────── */
 .stat-cards {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -235,7 +232,6 @@
     color: var(--color-primary);
 }
 
-/* ─── ADMIN TABLE ────────────────────────────────────────────────── */
 .admin-table-wrap {
     background: var(--color-white);
     border: 1px solid var(--color-border);
@@ -352,7 +348,6 @@ tbody tr:hover td {
     color: white;
 }
 
-/* ─── STATUS PILLS ───────────────────────────────────────────────── */
 .pill {
     display: inline-block;
     padding: 2px var(--space-3);
@@ -399,7 +394,6 @@ tbody tr:hover td {
     color: #dc2626;
 }
 
-/* ─── POST FORM MODAL ────────────────────────────────────────────── */
 .modal-overlay {
     position: fixed;
     inset: 0;
@@ -416,7 +410,7 @@ tbody tr:hover td {
     background: var(--color-white);
     border-radius: var(--radius-xl);
     width: 100%;
-    max-width: 720px;
+    max-width: 600px;
     box-shadow: var(--shadow-lg);
     animation: popIn 0.3s ease;
 }
@@ -572,12 +566,6 @@ tbody tr:hover td {
     }
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   ADMIN PATCH CSS — new semantic class names (no inline styles)
-   Add this AFTER admin-responsive.css
-   ═══════════════════════════════════════════════════════════════ */
-
-/* ── Topbar ─────────────────────────────────────────────────────── */
 .admin-topbar-left {
     display: flex;
     align-items: center;
@@ -592,7 +580,6 @@ tbody tr:hover td {
     flex-shrink: 0;
 }
 
-/* Hide "View Site" text on very small screens, keep icon */
 @media (max-width: 400px) {
     .admin-view-site-label {
         display: none;
@@ -603,7 +590,6 @@ tbody tr:hover td {
     }
 }
 
-/* ── Sidebar Footer ─────────────────────────────────────────────── */
 .admin-logout-btn {
     color: #555;
     padding: var(--space-1);
@@ -635,7 +621,6 @@ tbody tr:hover td {
     color: #fff5f5;
 }
 
-/* ── Sidebar Overlay ────────────────────────────────────────────── */
 .admin-sidebar-overlay {
     position: fixed;
     inset: 0;
@@ -644,7 +629,6 @@ tbody tr:hover td {
     backdrop-filter: blur(2px);
 }
 
-/* ── Table utility classes ──────────────────────────────────────── */
 .admin-table-count {
     margin-left: var(--space-2);
     font-family: var(--font-heading);
@@ -678,7 +662,6 @@ tbody tr:hover td {
     text-align: center;
 }
 
-/* ── Table cell helpers ─────────────────────────────────────────── */
 .post-title-cell {
     max-width: 280px;
 }
@@ -713,7 +696,6 @@ tbody tr:hover td {
     font-family: var(--font-heading);
 }
 
-/* ── Post Form – mobile tweaks ──────────────────────────────────── */
 @media (max-width: 480px) {
     .admin-table-actions-row {
         width: 100%;

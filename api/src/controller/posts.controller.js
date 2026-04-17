@@ -2,10 +2,9 @@ import Post from '../schemas/post.schema.js';
 import { sendSuccess, sendError, sendCreated, sendNotFound, sendBadRequest, asyncHandler } from '../common/response.js';
 import { PAGINATION_DEFAULTS, SORT_OPTIONS, POST_CATEGORIES, POST_STATUS } from '../common/constants.js';
 import cloudinary from '../config/cloudinary.config.js';
-import fs from 'fs';
 import slugify from 'slugify';
 
-// Get all posts with filtering, sorting, and pagination
+
 const getAllPosts = asyncHandler(async (req, res) => {
   const {
     page = PAGINATION_DEFAULTS.PAGE,
@@ -21,17 +20,14 @@ const getAllPosts = asyncHandler(async (req, res) => {
 
   const query = { status };
 
-  // Add category filter
   if (category && Object.values(POST_CATEGORIES).includes(category)) {
     query.category = category;
   }
 
-  // Add tag filter
   if (tag) {
     query.tags = { $in: [tag] };
   }
 
-  // Add search filter
   if (search) {
     query.$or = [
       { title: { $regex: search, $options: 'i' } },
@@ -84,10 +80,8 @@ const getAllPostAdmin = asyncHandler(async (req, res) => {
   const limitNumber = Math.min(parseInt(limit), 100);
   const skip = (pageNumber - 1) * limitNumber;
 
-  // 🔥 ADD QUERY OBJECT
   let query = {};
 
-  // ✅ SEARCH LOGIC
   if (search) {
     query.$or = [
       { title: { $regex: search, $options: 'i' } },
@@ -114,7 +108,6 @@ const getAllPostAdmin = asyncHandler(async (req, res) => {
   });
 });
 
-// Get posts by date range
 const getPostsByDateRange = asyncHandler(async (req, res) => {
   const { startDate, endDate } = req.query;
 
@@ -125,7 +118,6 @@ const getPostsByDateRange = asyncHandler(async (req, res) => {
   const start = new Date(startDate);
   const end = new Date(endDate);
 
-  // ✅ include full end date
   end.setHours(23, 59, 59, 999);
 
   if (isNaN(start.getTime()) || isNaN(end.getTime())) {
@@ -140,7 +132,6 @@ const getPostsByDateRange = asyncHandler(async (req, res) => {
   sendSuccess(res, 'Posts retrieved by date range', { posts });
 });
 
-// Get trending posts (most viewed in last 30 days)
 const getTrendingPosts = asyncHandler(async (req, res) => {
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -155,7 +146,6 @@ const getTrendingPosts = asyncHandler(async (req, res) => {
   sendSuccess(res, 'Trending posts retrieved', { posts });
 });
 
-// Get posts by category
 const getPostsByCategory = asyncHandler(async (req, res) => {
   const { category } = req.params;
 
@@ -177,9 +167,8 @@ const getPostsByCategory = asyncHandler(async (req, res) => {
   });
 });
 
-// Get posts by tags
 const getPostsByTags = asyncHandler(async (req, res) => {
-  const { tags } = req.query; // comma-separated tags
+  const { tags } = req.query; 
 
   if (!tags) {
     return sendBadRequest(res, 'Tags parameter is required');
@@ -194,7 +183,6 @@ const getPostsByTags = asyncHandler(async (req, res) => {
   sendSuccess(res, 'Posts retrieved by tags', { posts });
 });
 
-// Get single post by ID
 const getPostById = asyncHandler(async (req, res) => {
   const post = await Post.findById(req.params.id);
 
@@ -202,14 +190,13 @@ const getPostById = asyncHandler(async (req, res) => {
     return sendNotFound(res, 'Post not found');
   }
 
-  // Increment view count
   post.views += 1;
   await post.save();
 
   sendSuccess(res, 'Post retrieved successfully', { post });
 });
 
-// Get post by slug
+
 const getPostBySlug = asyncHandler(async (req, res) => {
   const post = await Post.findOne({ slug: req.params.slug });
 
@@ -217,7 +204,7 @@ const getPostBySlug = asyncHandler(async (req, res) => {
     return sendNotFound(res, 'Post not found');
   }
 
-  // Increment view count
+
   post.views += 1;
   await post.save();
 
@@ -251,19 +238,15 @@ const createPost = asyncHandler(async (req, res) => {
   let imageUrls = [];
 
   try {
-    // 🔥 Generate slug from title
+
     let baseSlug = slugify(req.body.title, { lower: true, strict: true });
 
     let slug = baseSlug;
     let count = 1;
 
-
-
-    // 🔁 Ensure unique slug
     while (await Post.findOne({ slug })) {
       slug = `${baseSlug}-${count++}`;
     }
-    console.log('Generated slug:', slug);
 
     if (req.files && req.files.length > 0) {
       for (const file of req.files) {
@@ -271,12 +254,10 @@ const createPost = asyncHandler(async (req, res) => {
         imageUrls.push(result.secure_url);
       }
     }
-
     const postData = {
       ...req.body,
-      slug, // ✅ auto-generated slug
-      images: imageUrls,
-      author: req.user._id
+      slug, 
+      images: imageUrls
     };
 
     const post = new Post(postData);
@@ -303,21 +284,15 @@ const updatePost = asyncHandler(async (req, res) => {
     return sendNotFound(res, 'Post not found');
   }
 
-  // ✅ Check ownership
-  if (
-    req.user.role !== 'admin' &&
-    post.author.toString() !== req.user._id.toString()
-  ) {
-    return sendForbidden(res, 'You can only update your own posts');
+  if (req.user.role !== 'admin') {
+    return sendForbidden(res, 'Only admins can update posts');
   }
 
   let newImageUrls = [];
 
   try {
-    // ✅ If new images uploaded
     if (req.files && req.files.length > 0) {
 
-      // 🔴 1. Delete old images from Cloudinary
       if (post.images && post.images.length > 0) {
         for (const url of post.images) {
           try {
@@ -329,7 +304,6 @@ const updatePost = asyncHandler(async (req, res) => {
         }
       }
 
-      // 🟢 2. Upload new images
       for (const file of req.files) {
         const result = await cloudinary.uploader.upload(file.path);
         newImageUrls.push(result.secure_url);
@@ -338,11 +312,9 @@ const updatePost = asyncHandler(async (req, res) => {
         // fs.unlinkSync(file.path);
       }
 
-      // 🟢 3. Replace images
       post.images = newImageUrls;
     }
 
-    // ✅ Update other fields
     Object.keys(req.body).forEach(key => {
       if (req.body[key] !== undefined) {
         post[key] = req.body[key];
@@ -355,7 +327,6 @@ const updatePost = asyncHandler(async (req, res) => {
 
   } catch (error) {
 
-    // ❌ If upload fails → rollback new uploads
     if (newImageUrls.length > 0) {
       for (const url of newImageUrls) {
         const publicId = url.split('/upload/')[1].split('.')[0];
@@ -367,7 +338,6 @@ const updatePost = asyncHandler(async (req, res) => {
   }
 });
 
-// Delete post (Admin or post author only)
 const deletePost = asyncHandler(async (req, res) => {
   const post = await Post.findById(req.params.id);
 
@@ -375,16 +345,14 @@ const deletePost = asyncHandler(async (req, res) => {
     return sendNotFound(res, 'Post not found');
   }
 
-  // Check ownership or admin access
-  if (req.user.role !== 'admin' && post.author.toString() !== req.user._id.toString()) {
-    return sendForbidden(res, 'You can only delete your own posts');
+  if (req.user.role !== 'admin') {
+    return sendForbidden(res, 'Only admins can delete posts');
   }
 
   await post.deleteOne();
   sendSuccess(res, 'Post deleted successfully');
 });
 
-// Like/Unlike post
 const toggleLikePost = asyncHandler(async (req, res) => {
   const post = await Post.findById(req.params.id);
 
@@ -392,7 +360,6 @@ const toggleLikePost = asyncHandler(async (req, res) => {
     return sendNotFound(res, 'Post not found');
   }
 
-  // For simplicity, just increment likes. In real app, you'd track user likes
   post.likes += 1;
   await post.save();
 

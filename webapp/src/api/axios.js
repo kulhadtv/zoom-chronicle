@@ -25,7 +25,9 @@ api.interceptors.response.use(
       localStorage.removeItem('zc_user');
       window.location.href = '/admin/login';
     }
-    return Promise.reject(err.response?.data || err);
+    const errorData = err.response?.data || { message: err.message || 'An error occurred' };
+    console.error('API Error:', errorData);
+    return Promise.reject(errorData);
   }
 );
 

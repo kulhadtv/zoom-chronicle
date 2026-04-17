@@ -61,22 +61,20 @@ export default function AdminPostForm() {
     });
     const [tags, setTags] = useState([]);
     const [tagInput, setTagInput] = useState('');
-    const [images, setImages] = useState([]);     // File objects
-    const [previews, setPreviews] = useState([]);     // data URLs
-    const [existingImgs, setExistingImgs] = useState([]); // URLs from API
+    const [images, setImages] = useState([]);    
+    const [previews, setPreviews] = useState([]);     
+    const [existingImgs, setExistingImgs] = useState([]); 
     const [dragOver, setDragOver] = useState(false);
 
-    /* ── ui state ── */
     const [loading, setLoading] = useState(isEdit);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState('');
-    const [toast, setToast] = useState(null); // { type, msg }
+    const [toast, setToast] = useState(null); 
     const [slugEdited, setSlugEdited] = useState(false);
 
     const contentRef = useRef(null);
     const fileInputRef = useRef(null);
 
-    /* ── load post for edit ── */
     useEffect(() => {
         if (!isEdit) return;
         postsAPI.getById(id)
@@ -99,14 +97,12 @@ export default function AdminPostForm() {
             .finally(() => setLoading(false));
     }, [id]);
 
-    /* ── auto-generate slug from title ── */
     useEffect(() => {
         if (!slugEdited && form.title) {
             setForm(f => ({ ...f, slug: slugify(f.title) }));
         }
     }, [form.title, slugEdited]);
 
-    /* ── generate image previews ── */
     useEffect(() => {
         if (!images.length) { setPreviews([]); return; }
         const urls = [];
@@ -126,10 +122,8 @@ export default function AdminPostForm() {
         setTimeout(() => setToast(null), 3500);
     };
 
-    /* ── field change ── */
     const set = (key, val) => setForm(f => ({ ...f, [key]: val }));
 
-    /* ── toolbar actions ── */
     const insertAt = (before, after = '') => {
         const ta = contentRef.current;
         if (!ta) return;
@@ -158,7 +152,6 @@ export default function AdminPostForm() {
         { icon: <RiLinkM size={14} />, title: 'Link', action: () => insertAt('<a href="">', '</a>') },
     ];
 
-    /* ── tags ── */
     const addTag = (raw) => {
         const t = raw.trim().replace(/[^a-zA-Z0-9\s]/g, '').trim();
         if (t && !tags.includes(t) && tags.length < 10) setTags(ts => [...ts, t]);
@@ -170,7 +163,6 @@ export default function AdminPostForm() {
         if (e.key === 'Backspace' && !tagInput && tags.length) setTags(ts => ts.slice(0, -1));
     };
 
-    /* ── image handling ── */
     const addImages = (files) => {
         const valid = Array.from(files).filter(f => f.type.startsWith('image/')).slice(0, 5 - images.length);
         setImages(prev => [...prev, ...valid].slice(0, 5));
@@ -178,13 +170,11 @@ export default function AdminPostForm() {
     const removeNewImage = (i) => { setImages(prev => prev.filter((_, j) => j !== i)); };
     const removeExistImg = (url) => setExistingImgs(prev => prev.filter(u => u !== url));
 
-    /* ── drag & drop ── */
     const onDrop = (e) => {
         e.preventDefault(); setDragOver(false);
         addImages(e.dataTransfer.files);
     };
 
-    /* ── submit ── */
     const handleSubmit = async (statusOverride) => {
         const submitStatus = statusOverride || form.status;
         if (!form.title.trim()) { setError('Title is required.'); return; }
@@ -210,15 +200,14 @@ export default function AdminPostForm() {
             showToast('success', isEdit ? 'Post updated successfully!' : 'Post published successfully!');
             setTimeout(() => navigate('/admin/posts'), 1200);
         } catch (err) {
-            setError(err?.message || 'Save failed. Please check your connection and try again.');
+            const errorMsg = err?.message || err?.msg || err?.error || 'Save failed. Please check your connection and try again.';
+            console.error('Submit error details:', err);
+            setError(errorMsg);
         } finally {
             setSaving(false);
         }
     };
 
-    /* ─────────────────────────────────────────
-       LOADING SKELETON
-    ───────────────────────────────────────── */
     if (loading) return (
         <div className="post-form-page">
             <div className="post-form-header">
@@ -243,13 +232,9 @@ export default function AdminPostForm() {
         </div>
     );
 
-    /* ─────────────────────────────────────────
-       MAIN RENDER
-    ───────────────────────────────────────── */
     return (
         <div className="post-form-page">
 
-            {/* ── Toast ── */}
             {toast && (
                 <div className={`form-toast ${toast.type}`}>
                     {toast.type === 'success' ? <RiCheckLine size={16} /> : <RiAlertLine size={16} />}
@@ -257,7 +242,6 @@ export default function AdminPostForm() {
                 </div>
             )}
 
-            {/* ── Page Header ── */}
             <div className="post-form-header">
                 <div className="post-form-header-left">
                     <button className="post-form-back" onClick={() => navigate('/admin/posts')}>
@@ -283,7 +267,6 @@ export default function AdminPostForm() {
                 </div>
             </div>
 
-            {/* ── Error Banner ── */}
             {error && (
                 <div className="form-error-banner" style={{ marginBottom: 'var(--space-5)' }}>
                     <RiAlertLine size={18} />
@@ -296,9 +279,6 @@ export default function AdminPostForm() {
 
             <div className="post-form-layout">
 
-                {/* ═══════════════════════════════════
-            LEFT — MAIN CONTENT
-        ═══════════════════════════════════ */}
                 <div className="post-form-main">
 
                     {/* ── Title & Slug ── */}
@@ -359,7 +339,6 @@ export default function AdminPostForm() {
                         </div>
                     </div>
 
-                    {/* ── Content Editor ── */}
                     <div className="form-card">
                         <div className="form-card-header">
                             <div className="form-card-icon"><RiFileTextLine size={15} /></div>
@@ -389,7 +368,6 @@ export default function AdminPostForm() {
                                     )}
                                 </div>
 
-                                {/* Textarea */}
                                 <textarea
                                     ref={contentRef}
                                     className="editor-textarea"
@@ -408,7 +386,6 @@ export default function AdminPostForm() {
                         </div>
                     </div>
 
-                    {/* ── Images ── */}
                     <div className="form-card">
                         <div className="form-card-header">
                             <div className="form-card-icon"><RiImageLine size={15} /></div>
@@ -419,7 +396,6 @@ export default function AdminPostForm() {
                         </div>
                         <div className="form-card-body">
 
-                            {/* Existing images (edit mode) */}
                             {existingImgs.length > 0 && (
                                 <>
                                     <div className="form-label" style={{ marginBottom: 'var(--space-2)' }}>Current Images</div>
@@ -437,7 +413,7 @@ export default function AdminPostForm() {
                                 </>
                             )}
 
-                            {/* Dropzone */}
+
                             {(images.length + existingImgs.length) < 5 && (
                                 <label
                                     className={`image-dropzone${dragOver ? ' drag-over' : ''}`}
@@ -460,7 +436,6 @@ export default function AdminPostForm() {
                                 </label>
                             )}
 
-                            {/* New image previews */}
                             {previews.length > 0 && (
                                 <>
                                     <div className="form-label" style={{ marginBottom: 'var(--space-2)' }}>New Uploads</div>
@@ -484,9 +459,6 @@ export default function AdminPostForm() {
 
                 </div>
 
-                {/* ═══════════════════════════════════
-            RIGHT — META SIDEBAR
-        ═══════════════════════════════════ */}
                 <div className="post-form-meta">
 
                     {/* ── Publish ── */}
@@ -545,7 +517,6 @@ export default function AdminPostForm() {
                         </div>
                     </div>
 
-                    {/* ── Category ── */}
                     <div className="form-card">
                         <div className="form-card-header">
                             <div className="form-card-icon"><RiSettings3Line size={15} /></div>
@@ -567,7 +538,6 @@ export default function AdminPostForm() {
                         </div>
                     </div>
 
-                    {/* ── Tags ── */}
                     <div className="form-card">
                         <div className="form-card-header">
                             <div className="form-card-icon"><RiPriceTag3Line size={15} /></div>
@@ -604,7 +574,6 @@ export default function AdminPostForm() {
                                 Press <kbd style={{ background: 'var(--color-bg-muted)', padding: '1px 5px', borderRadius: 3, border: '1px solid var(--color-border)' }}>Enter</kbd> or <kbd style={{ background: 'var(--color-bg-muted)', padding: '1px 5px', borderRadius: 3, border: '1px solid var(--color-border)' }}>,</kbd> to add a tag
                             </div>
 
-                            {/* Suggested tags based on category */}
                             {form.category && SUGGESTED_TAGS[form.category]?.length > 0 && (
                                 <div>
                                     <div className="form-label" style={{ marginBottom: 'var(--space-2)' }}>Suggestions</div>
@@ -630,7 +599,6 @@ export default function AdminPostForm() {
                         </div>
                     </div>
 
-                    {/* ── Article Stats (edit only) ── */}
                     {form.content && (
                         <div className="form-card">
                             <div className="form-card-header">
