@@ -292,6 +292,9 @@
     .hero-title {
         font-size: var(--text-lg);
     }
+    .hero-cat{
+        display: none;
+    }
 
     /* Main card */
     .news-card-body {

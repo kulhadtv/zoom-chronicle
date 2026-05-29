@@ -5,6 +5,8 @@ import { HeroCard } from '../components/common/NewsCard';
 
 export default function HeroSection({ posts = [] }) {
     const [slide, setSlide] = useState(0);
+    const [touchStart, setTouchStart] = useState(0);
+    const [touchEnd, setTouchEnd] = useState(0);
 
     useEffect(() => { setSlide(0); }, [posts]);
 
@@ -16,15 +18,39 @@ export default function HeroSection({ posts = [] }) {
         return () => clearInterval(t);
     }, [posts.length]);
 
+    useEffect(() => {
+        if (!touchStart || !touchEnd) return;
+        const distance = touchStart - touchEnd;
+        const isLeftSwipe = distance > 50;
+        const isRightSwipe = distance < -50;
+
+        const prev = () => setSlide(s => (s - 1 + posts.length) % posts.length);
+        const next = () => setSlide(s => (s + 1) % posts.length);
+
+        if (isLeftSwipe) {
+            next();
+        } else if (isRightSwipe) {
+            prev();
+        }
+    }, [touchStart, touchEnd, posts.length]);
+
     if (!posts.length) return null;
 
     const prev = () => setSlide(s => (s - 1 + posts.length) % posts.length);
     const next = () => setSlide(s => (s + 1) % posts.length);
 
+    const handleTouchStart = (e) => {
+        setTouchStart(e.targetTouches[0].clientX);
+    };
+
+    const handleTouchEnd = (e) => {
+        setTouchEnd(e.changedTouches[0].clientX);
+    };
+
     return (
         <section className="hero-section">
             <div className="container">
-                <div className="hero-carousel">
+                <div className="hero-carousel" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
                     {posts.map((post, i) => (
                         <div key={post._id} className={`hero-slide${i === slide ? ' active' : ''}`}>
                             <HeroCard post={post} />

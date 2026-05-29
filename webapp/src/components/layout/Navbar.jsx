@@ -129,11 +129,11 @@ export default function Navbar() {
                                 Logout
                             </button>
                         )}
-                        {!user && (
+                        {/* {!user && (
                             <Link to="/admin/login" className="btn btn-outline btn-sm">
                                 Login
                             </Link>
-                        )}
+                        )} */}
 
                         <button className="hamburger" onClick={() => setMobileOpen(true)} aria-label="Open menu">
                             <span /><span /><span />

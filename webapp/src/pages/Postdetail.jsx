@@ -63,18 +63,6 @@ export default function PostDetail() {
         }
     };
 
-    const handleLike = async () => {
-        if (!isLoggedIn) { navigate('/admin/login'); return; }
-        try {
-            await postsAPI.toggleLike(post._id);
-            setLiked(l => !l);
-            setLikeCount(c => liked ? c - 1 : c + 1);
-        } catch {
-            setLiked(l => !l);
-            setLikeCount(c => liked ? c - 1 : c + 1);
-        }
-    };
-
     const copyLink = () => {
         navigator.clipboard.writeText(window.location.href);
         setCopied(true);
@@ -156,10 +144,7 @@ export default function PostDetail() {
 
                         {/* Like / Share */}
                         <div className="post-actions">
-                            <button className={`like-btn${liked ? ' liked' : ''}`} onClick={handleLike}>
-                                {liked ? <RiHeartFill size={16} /> : <RiHeartLine size={16} />}
-                                {liked ? 'Liked' : 'Like'} ({likeCount})
-                            </button>
+
                             <span className="share-label"><RiShareLine size={14} /> Share:</span>
                             <div className="share-btns">
                                 <a href={`https://twitter.com/intent/tweet?url=${window.location.href}&text=${post.title}`}

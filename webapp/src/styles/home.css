@@ -79,6 +79,13 @@
     right: var(--space-4);
 }
 
+/* Hide arrow buttons on mobile */
+@media (max-width: 768px) {
+    .hero-arrow {
+        display: none;
+    }
+}
+
 /* ─── SECTION ────────────────────────────────────────────────────── */
 .home-section {
     padding: var(--space-12) 0;
