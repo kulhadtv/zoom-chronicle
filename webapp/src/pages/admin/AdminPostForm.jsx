@@ -74,6 +74,7 @@ export default function AdminPostForm() {
 
     const contentRef = useRef(null);
     const fileInputRef = useRef(null);
+    const errorRef = useRef(null);
 
     useEffect(() => {
         if (!isEdit) return;
@@ -116,6 +117,13 @@ export default function AdminPostForm() {
             reader.readAsDataURL(file);
         });
     }, [images]);
+
+    useEffect(() => {
+        if (error && errorRef.current) {
+            const top = errorRef.current.getBoundingClientRect().top + window.pageYOffset - 80;
+            window.scrollTo({ top, behavior: 'smooth' });
+        }
+    }, [error]);
 
     const showToast = (type, msg) => {
         setToast({ type, msg });
@@ -164,8 +172,17 @@ export default function AdminPostForm() {
     };
 
     const addImages = (files) => {
-        const valid = Array.from(files).filter(f => f.type.startsWith('image/')).slice(0, 5 - images.length);
-        setImages(prev => [...prev, ...valid].slice(0, 5));
+        const valid = Array.from(files).filter(f => f.type.startsWith('image/'));
+        if (!valid.length) return;
+        if (valid.length > 1) {
+            setError('Please upload only one image.');
+        }
+        const file = valid[0];
+        if (file.size > 5 * 1024 * 1024) {
+            setError('Image must be 5MB or smaller.');
+            return;
+        }
+        setImages([file]);
     };
     const removeNewImage = (i) => { setImages(prev => prev.filter((_, j) => j !== i)); };
     const removeExistImg = (url) => setExistingImgs(prev => prev.filter(u => u !== url));
@@ -191,7 +208,7 @@ export default function AdminPostForm() {
             fd.append('category', form.category);
             fd.append('status', submitStatus);
             tags.forEach(t => fd.append('tags[]', t));
-            images.forEach(img => fd.append('images', img));
+            if (images[0]) fd.append('images', images[0]);
             existingImgs.forEach(url => fd.append('existingImages[]', url));
 
             if (isEdit) await postsAPI.update(id, fd);
@@ -268,7 +285,7 @@ export default function AdminPostForm() {
             </div>
 
             {error && (
-                <div className="form-error-banner" style={{ marginBottom: 'var(--space-5)' }}>
+                <div ref={errorRef} className="form-error-banner" style={{ marginBottom: 'var(--space-5)' }}>
                     <RiAlertLine size={18} />
                     {error}
                     <button style={{ marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer', color: '#dc2626', display: 'flex' }} onClick={() => setError('')}>
@@ -391,7 +408,7 @@ export default function AdminPostForm() {
                             <div className="form-card-icon"><RiImageLine size={15} /></div>
                             <div className="form-card-label">Media / Images</div>
                             <div style={{ marginLeft: 'auto', fontFamily: 'var(--font-heading)', fontSize: 'var(--text-xs)', color: 'var(--color-text-dim)' }}>
-                                {images.length + existingImgs.length}/5 images
+                                {images.length + existingImgs.length}/1 image
                             </div>
                         </div>
                         <div className="form-card-body">
@@ -414,7 +431,7 @@ export default function AdminPostForm() {
                             )}
 
 
-                            {(images.length + existingImgs.length) < 5 && (
+                            {(images.length + existingImgs.length) < 1 && (
                                 <label
                                     className={`image-dropzone${dragOver ? ' drag-over' : ''}`}
                                     onDragOver={e => { e.preventDefault(); setDragOver(true); }}
@@ -425,12 +442,11 @@ export default function AdminPostForm() {
                                     <div className="dropzone-text">
                                         <span>Click to upload</span> or drag & drop
                                     </div>
-                                    <div className="dropzone-hint">PNG, JPG, WEBP — max 5 images total · First image = cover photo</div>
+                                    <div className="dropzone-hint">PNG, JPG, WEBP — max 1 image · Cover photo</div>
                                     <input
                                         ref={fileInputRef}
                                         type="file"
                                         accept="image/*"
-                                        multiple
                                         onChange={e => addImages(e.target.files)}
                                     />
                                 </label>

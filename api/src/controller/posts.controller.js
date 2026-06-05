@@ -1,5 +1,5 @@
 import Post from '../schemas/post.schema.js';
-import { sendSuccess, sendError, sendCreated, sendNotFound, sendBadRequest, asyncHandler } from '../common/response.js';
+import { sendSuccess, sendError, sendCreated, sendNotFound, sendBadRequest, sendForbidden, asyncHandler } from '../common/response.js';
 import { PAGINATION_DEFAULTS, SORT_OPTIONS, POST_CATEGORIES, POST_STATUS } from '../common/constants.js';
 import cloudinary from '../config/cloudinary.config.js';
 import slugify from 'slugify';
@@ -248,15 +248,14 @@ const createPost = asyncHandler(async (req, res) => {
       slug = `${baseSlug}-${count++}`;
     }
 
-    if (req.files && req.files.length > 0) {
-      for (const file of req.files) {
-        const result = await cloudinary.uploader.upload(file.path);
-        imageUrls.push(result.secure_url);
-      }
+    const uploadedFile = req.file || req.files?.image?.[0] || req.files?.images?.[0];
+    if (uploadedFile) {
+      imageUrls.push(uploadedFile.path);
     }
+
     const postData = {
       ...req.body,
-      slug, 
+      slug,
       images: imageUrls
     };
 
@@ -272,6 +271,8 @@ const createPost = asyncHandler(async (req, res) => {
         await cloudinary.uploader.destroy(publicId);
       }
     }
+
+    console.error('Error creating post:', error);
 
     throw error;
   }
@@ -291,7 +292,9 @@ const updatePost = asyncHandler(async (req, res) => {
   let newImageUrls = [];
 
   try {
-    if (req.files && req.files.length > 0) {
+    const uploadedFile = req.file || req.files?.image?.[0] || req.files?.images?.[0];
+
+    if (uploadedFile) {
 
       if (post.images && post.images.length > 0) {
         for (const url of post.images) {
@@ -304,14 +307,7 @@ const updatePost = asyncHandler(async (req, res) => {
         }
       }
 
-      for (const file of req.files) {
-        const result = await cloudinary.uploader.upload(file.path);
-        newImageUrls.push(result.secure_url);
-
-        // optional: delete temp file
-        // fs.unlinkSync(file.path);
-      }
-
+      newImageUrls.push(uploadedFile.path);
       post.images = newImageUrls;
     }
 

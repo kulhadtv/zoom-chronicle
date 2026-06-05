@@ -6,7 +6,7 @@ import {
 import { adminAPI, postsAPI } from '../../api/axios';
 
 export default function AdminDashboard() {
-    const [stats, setStats] = useState({ posts: 0, users: 0, views: 0, likes: 0 });
+    const [stats, setStats] = useState({ posts: 0, users: 0, views: 0 });
     const [recent, setRecent] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -20,16 +20,14 @@ export default function AdminDashboard() {
                 const posts = postsRes.value?.data?.posts || [];
                 const users = usersRes.value?.data?.users || [];
                 const totalViews = posts.reduce((s, p) => s + (p.views || 0), 0);
-                const totalLikes = posts.reduce((s, p) => s + (p.likes?.length ?? p.likes ?? 0), 0);
                 setStats({
                     posts: postsRes.value?.data?.pagination?.total || posts.length,
                     users: users.length || 24,
                     views: totalViews,
-                    likes: totalLikes,
                 });
                 setRecent(posts);
             } catch {
-                setStats({ posts: 134, users: 24, views: 89432, likes: 3210 });
+                setStats({ posts: 134, users: 24, views: 89432 });
                 setRecent([]);
             } finally {
                 setLoading(false);
@@ -42,7 +40,6 @@ export default function AdminDashboard() {
         { label: 'Total Posts', value: stats.posts, icon: '📰', color: '#fff0f0' },
         { label: 'Total Users', value: stats.users, icon: '👥', color: '#f0f4ff' },
         { label: 'Total Views', value: stats.views.toLocaleString(), icon: '👁️', color: '#f0fff4' },
-        { label: 'Total Likes', value: stats.likes.toLocaleString(), icon: '❤️', color: '#fff8f0' },
     ];
 
     return (

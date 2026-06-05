@@ -1,4 +1,5 @@
-import { sendError } from "../common/response.js";
+import multer from 'multer';
+import { sendError, sendBadRequest } from "../common/response.js";
 
 
 export const errorHandler = (err, req, res, next) => {
@@ -16,6 +17,17 @@ export const errorHandler = (err, req, res, next) => {
         const errors = Object.values(err.errors).map(e => e.message);
 
         return sendBadRequest(res, 'Validation failed', errors);
+    }
+
+    // ✅ Multer file upload errors
+    if (err instanceof multer.MulterError) {
+        if (err.code === 'LIMIT_FILE_SIZE') {
+            return sendBadRequest(res, 'Image must be 5MB or smaller.');
+        }
+        if (err.code === 'LIMIT_UNEXPECTED_FILE') {
+            return sendBadRequest(res, 'Only image files are allowed.');
+        }
+        return sendBadRequest(res, err.message);
     }
 
     // ✅ Default error

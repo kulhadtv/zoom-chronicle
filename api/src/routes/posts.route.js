@@ -37,8 +37,14 @@ router.get('/slug/:slug', getPostBySlug);
 
 
 // Protected routes (authentication required)
-router.post('/', authenticate, requireAuthor, upload.array('images', 5), validatePostData, createPost);
-router.put('/:id', authenticate, requireAuthor, validateObjectId, upload.array('images', 5), validatePostData, updatePost);
+router.post('/', authenticate, requireAuthor, upload.fields([
+  { name: 'image', maxCount: 1 },
+  { name: 'images', maxCount: 1 },
+]), validatePostData, createPost);
+router.put('/:id', authenticate, requireAuthor, validateObjectId, upload.fields([
+  { name: 'image', maxCount: 1 },
+  { name: 'images', maxCount: 1 },
+]), validatePostData, updatePost);
 router.delete('/:id', authenticate, requireAuthor, validateObjectId, deletePost);
 
 // Like post (authenticated users)

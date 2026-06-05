@@ -2,7 +2,7 @@ import "../styles/pages/postDetails.css";
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
-    RiTimeLine, RiEyeLine, RiHeartLine, RiHeartFill,
+    RiTimeLine, RiEyeLine,
     RiShareLine, RiTwitterXFill,
     RiFacebookFill, RiWhatsappLine, RiLinkM,
 } from 'react-icons/ri';
@@ -22,8 +22,6 @@ export default function PostDetail() {
     const { isLoggedIn } = useAuth();
     const [post, setPost] = useState(null);
     const [related, setRelated] = useState([]);
-    const [liked, setLiked] = useState(false);
-    const [likeCount, setLikeCount] = useState(0);
     const [loading, setLoading] = useState(true);
     const [copied, setCopied] = useState(false);
 
@@ -40,11 +38,9 @@ export default function PostDetail() {
             const p = res?.data?.post || res?.data;
             console.log('Post data:', p);
             setPost(p);
-            setLikeCount(p?.likes?.length ?? p?.likes ?? 0);
             if (p?.category) fetchRelated(p.category, p._id);
         } catch {
             setPost([]);
-            setLikeCount(142);
             fetchRelated('National', null);
         } finally {
             setLoading(false);
@@ -115,7 +111,6 @@ export default function PostDetail() {
                             <div className="post-meta-bar">
                                 <div className="post-meta-item"><RiTimeLine size={14} />{timeAgo(post.createdAt)}</div>
                                 {post.views != null && <div className="post-meta-item"><RiEyeLine size={14} />{post.views} views</div>}
-                                <div className="post-meta-item"><RiHeartLine size={14} />{likeCount} likes</div>
                             </div>
                         </header>
 

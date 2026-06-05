@@ -157,7 +157,6 @@ export function AdminPost() {
                 <th>Category</th>
                 <th>Status</th>
                 <th>Views</th>
-                <th>Likes</th>
                 <th>Date</th>
                 <th>Actions</th>
               </tr>
@@ -166,7 +165,7 @@ export function AdminPost() {
               {loading
                 ? Array.from({ length: 8 }).map((_, i) => (
                   <tr key={i}>
-                    <td colSpan={7}>
+                    <td colSpan={6}>
                       <div className="skeleton" style={{ height: 18, borderRadius: 6 }} />
                     </td>
                   </tr>
@@ -174,7 +173,7 @@ export function AdminPost() {
                 : posts.length === 0
                   ? (
                     <tr>
-                      <td colSpan={7} className="table-empty-cell">
+                      <td colSpan={6} className="table-empty-cell">
                         No posts found{search ? ` for "${search}"` : ''}
                       </td>
                     </tr>
@@ -196,9 +195,6 @@ export function AdminPost() {
                       </td>
                       <td className="stat-cell">
                         {(p.views || 0).toLocaleString()}
-                      </td>
-                      <td className="stat-cell">
-                        {p.likes?.length ?? p.likes ?? 0}
                       </td>
                       <td className="date-cell">
                         {p.createdAt

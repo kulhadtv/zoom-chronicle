@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { RiHeartLine, RiEyeLine, RiTimeLine } from 'react-icons/ri';
+import { RiEyeLine, RiTimeLine } from 'react-icons/ri';
 import '../../styles/newsCard.css';
 
 const IMG_HEIGHTS = { sm: 160, md: 200, lg: 240 };
@@ -36,7 +36,6 @@ export function NewsCard({ post, size = 'md' }) {
                     <div className="news-card-stats">
                         <span className="stat-item"><RiTimeLine size={11} /> {timeAgo(post.createdAt)}</span>
                         {post.views != null && <span className="stat-item"><RiEyeLine size={11} /> {post.views}</span>}
-                        {post.likes != null && <span className="stat-item"><RiHeartLine size={11} /> {post.likes?.length ?? post.likes}</span>}
                     </div>
                 </div>
             </div>
